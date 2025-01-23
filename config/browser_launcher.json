@@ -1,0 +1,4 @@
+{
+    "browser_mode": true,
+    "chrome_driver_path": "utils/chromedriver/macOS/chromedriver"
+}

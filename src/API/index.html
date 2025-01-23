@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      /* Общие стили */
+      body {
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        color: #333;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-size: 16px;
+        line-height: 1.6;
+        overflow: hidden;
+      }
+  
+      .container {
+        text-align: center;
+        background: #f9f9f9;
+        border-radius: 15px;
+        padding: 30px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ddd;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+  
+      .container:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+      }
+  
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        color: #333;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+  
+      .beta-info {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 20px;
+        font-style: italic;
+      }
+  
+      .status {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        font-weight: 500;
+        color: #444;
+      }
+  
+      .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+  
+      button {
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 24px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+  
+      button:hover {
+        background: #444;
+        transform: translateY(-3px);
+      }
+  
+      button:active {
+        transform: translateY(1px);
+        background: #555;
+      }
+  
+      button:disabled {
+        background: #aaa;
+        cursor: not-allowed;
+      }
+  
+      input {
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        color: #333;
+        font-size: 1rem;
+        margin-right: 15px;
+        width: 100%;
+        max-width: 250px;
+        margin-bottom: 20px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+  
+      input:focus {
+        outline: none;
+        border-color: #333;
+        box-shadow: 0 0 5px rgba(51, 51, 51, 0.5);
+      }
+  
+      .logs {
+        margin-top: 20px;
+        text-align: left;
+        font-size: 0.9rem;
+        color: #555;
+      }
+  
+      .logs h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        color: #333;
+      }
+  
+      .logs ul {
+        list-style: none;
+        padding: 0;
+        max-height: 180px;
+        overflow-y: auto;
+        background: #f4f4f4;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ddd;
+      }
+  
+      .logs ul li {
+        margin: 5px 0;
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+  
+      .logs ul li:nth-child(even) {
+        background-color: #efefef;
+      }
+  
+      .logs ul li:nth-child(odd) {
+        background-color: #ffffff;
+      }
+  
+      .logs ul li.error {
+        color: #f44336;
+        font-weight: bold;
+      }
+  
+      .logs ul li.success {
+        color: #4caf50;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Twitch Automation Interface</h1>
+      <div class="beta-info">Beta Version - Testing in Progress</div>
+      <div class="status" id="status">Status: Ready</div>
+  
+      <div class="button-group">
+        <button id="start-button">Start Automation</button>
+        <button id="stop-button">Stop Browser</button>
+        <button id="info-button" disabled>Get Browser Info</button>
+        <button id="terminateButton" disabled>Terminate Processes</button>
+      </div>
+  
+      <div class="stream-input">
+        <input type="text" id="streamer-name" placeholder="Enter streamer name">
+        <button id="change-streamer">Change Streamer</button>
+      </div>
+  
+      <div class="stream-input">
+        <input type="number" id="time-input" min="1" placeholder="Enter time in seconds">
+        <button id="change-time">Change Timer</button>
+      </div>
+  
+      <div class="logs">
+        <h3>Logs</h3>
+        <ul id="log-list"></ul>
+      </div>
+    </div>
+  <script>
+    const startButton = document.getElementById("start-button");
+    const stopButton = document.getElementById("stop-button");
+    const infoButton = document.getElementById("info-button");
+    const terminateButton = document.getElementById("terminateButton");
+    const streamerInput = document.getElementById("streamer-name");
+    const timeInput = document.getElementById("time-input");
+    const statusDiv = document.getElementById("status");
+    const logList = document.getElementById("log-list");
+
+    // Добавить лог в интерфейс
+    function addLog(message) {
+      const logItem = document.createElement("li");
+      logItem.textContent = message;
+      logList.appendChild(logItem);
+    }
+
+    // Управление кнопками
+    function setButtonsState(isDisabled) {
+      startButton.disabled = isDisabled;
+      stopButton.disabled = isDisabled;
+      infoButton.disabled = isDisabled;
+      terminateButton.disabled = isDisabled;
+    }
+
+    // Запрос на запуск автоматизации
+    startButton.addEventListener("click", async () => {
+      setButtonsState(true);
+      statusDiv.textContent = "Status: Starting automation...";
+      try {
+        const response = await fetch("http://127.0.0.1:8000/start_twitch", { method: "POST" });
+        const result = await response.json();
+        addLog(result.message || "Automation started.");
+        statusDiv.textContent = `Status: ${result.status}`;
+      } catch (error) {
+        addLog("Error: Unable to start automation.");
+        statusDiv.textContent = "Status: Error";
+      }
+      setButtonsState(false);
+    });
+
+    // Запрос на остановку браузера
+    stopButton.addEventListener("click", async () => {
+      setButtonsState(true);
+      statusDiv.textContent = "Status: Stopping browser...";
+      try {
+        const response = await fetch("http://127.0.0.1:8000/stop_browser", { method: "POST" });
+        const result = await response.json();
+        addLog(result.message || "Browser stopped.");
+        statusDiv.textContent = `Status: ${result.status}`;
+      } catch (error) {
+        addLog("Error: Unable to stop browser.");
+        statusDiv.textContent = "Status: Error";
+      }
+      setButtonsState(false);
+    });
+
+// Запрос информации о браузере
+infoButton.addEventListener("click", async () => {
+      setButtonsState(true);
+      statusDiv.textContent = "Status: Fetching browser info...";
+      try {
+        const response = await fetch("http://127.0.0.1:8000/browser_info");
+        const result = await response.json();
+        addLog(JSON.stringify(result.browser_info || "No info available."));
+        statusDiv.textContent = `Status: ${result.status}`;
+      } catch (error) {
+        addLog("Error: Unable to fetch browser info.");
+        statusDiv.textContent = "Status: Error";
+      }
+      setButtonsState(false);
+});
+
+// Запрос на завершение процессов
+terminateButton.addEventListener("click", async () => {
+  setButtonsState(true);
+  statusDiv.textContent = "Status: Terminating processes...";
+  try {
+    const response = await fetch("http://127.0.0.1:8000/terminate_processes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+      // Тело запроса больше не нужно
+    });
+
+    const result = await response.json();
+    addLog(result.message || "Processes terminated.");
+    statusDiv.textContent = `Status: ${result.status}`;
+  } catch (error) {
+    addLog("Error: Unable to terminate processes.");
+    statusDiv.textContent = "Status: Error";
+  }
+  setButtonsState(false);
+});
+
+// При загрузке страницы получаем текущего стримера
+window.addEventListener('load', async () => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/get_streamer");
+    const result = await response.json();
+    // Выводим текущего стримера в интерфейсе
+    streamerInput.value = result.streamer;
+    statusDiv.textContent = `Current Streamer: ${result.streamer}`;
+  } catch (error) {
+    addLog("Error: Unable to fetch current streamer.");
+    statusDiv.textContent = "Status: Error";
+  }
+});
+
+// Запрос на изменение стримера
+document.getElementById("change-streamer").addEventListener("click", async () => {
+  const newStreamer = streamerInput.value;
+  if (!newStreamer) {
+    addLog("Error: Streamer name is required.");
+    return;
+  }
+
+  setButtonsState(true);
+  statusDiv.textContent = "Status: Changing streamer...";
+  try {
+    const response = await fetch("http://127.0.0.1:8000/change_streamer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ streamer: newStreamer })
+    });
+    const result = await response.json();
+    addLog(result.message || "Streamer changed.");
+    statusDiv.textContent = `Status: ${result.status}`;
+  } catch (error) {
+    addLog("Error: Unable to change streamer.");
+    statusDiv.textContent = "Status: Error";
+  }
+  setButtonsState(false);
+});
+document.getElementById("change-time").addEventListener("click", async () => {
+  const timeInput = document.getElementById("time-input");  // Получаем поле ввода
+  const time = timeInput.value;
+
+  // Проверка, что значение является числом и больше 0
+  if (!time || isNaN(time) || time <= 0) {
+    addLog("Error: Please enter a valid positive number for the time.");
+    return;
+  }
+
+  setButtonsState(true);  // Блокируем кнопки
+  statusDiv.textContent = "Status: Changing time...";  // Обновляем статус
+  try {
+    // Отправляем запрос на сервер
+    const response = await fetch("http://127.0.0.1:8000/change_shutdown_timer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ time: parseInt(time) })  // Преобразуем строку в целое число
+    });
+
+    if (!response.ok) {  // Проверяем, что запрос успешен
+      throw new Error("Failed to update the timer");
+    }
+
+    const result = await response.json();  // Получаем ответ от сервера
+    addLog(result.message || "Time changed.");
+    statusDiv.textContent = `Status: ${result.status}`;
+  } catch (error) {
+    addLog(`Error: ${error.message || "Unable to change time."}`);  // Выводим ошибку
+    statusDiv.textContent = "Status: Error";
+  }
+  setButtonsState(false);  // Разблокируем кнопки
+});
+  </script>
+</body>
+</html>

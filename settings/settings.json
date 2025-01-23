@@ -1,0 +1,17 @@
+{
+    "AUTHENTICATION": {
+        "USE_COOKIE_METHOD": true,
+        "BROWSER_CHOICE": "firefox"
+    },
+    "encryption": {
+        "KEY_SIZE": 32,
+        "DEFAULT_KEY": "BTG24-d5w5BxiVuG-4Jeqnt7Hi48QiPVmo3lyYAUbBg=",
+        "ENCODING": "utf-8"
+    },
+    "TWITCH": {
+        "stream_url": "https://www.twitch.tv/TwixFlux"
+    },
+    "BROWSER_SETTINGS": {
+        "AUTO_SHUTDOWN_TIMER": 60
+    }
+}
