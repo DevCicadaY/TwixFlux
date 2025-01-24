@@ -1,7 +1,7 @@
 {
     "AUTHENTICATION": {
         "USE_COOKIE_METHOD": true,
-        "BROWSER_CHOICE": "firefox"
+        "BROWSER_CHOICE": "chrome"
     },
     "encryption": {
         "KEY_SIZE": 32,
