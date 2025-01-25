@@ -18,6 +18,10 @@
 
 [![Main Screen](/TwixFlux%20(Prototype).png)](https://www.youtube.com/watch?v=-OxDIS6Qr4c)
 
+> [!IMPORTANT]
+> This project is still in development. Please leave a comment in [Issues](https://github.com/DevCicadaY/TwixFlux/issues) if you're interested or have suggestions.
+> Thank you!
+
 TwixFlux is an innovative application designed to automate routine tasks on the Twitch platform. Although the project is still in its early stages, it already offers key features to simplify interaction with Twitch. The app is built with a focus on user convenience and security, making it a valuable tool for optimizing workflows. However, since the project is still under development, it may have some limitations typical of early versions.
 
 ---
